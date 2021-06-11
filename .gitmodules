@@ -1,0 +1,3 @@
+[submodule "Reactor"]
+	path = Reactor
+	url = https://github.com/NuclearPowered/Reactor

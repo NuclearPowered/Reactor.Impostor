@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+
+        <Version>0.1.0</Version>
+        <AssemblyTitle>Example reactor plugin</AssemblyTitle>
+        <Authors>NuclearPowered</Authors>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Reactor.Impostor\Reactor.Impostor.csproj">
+            <Private>false</Private>
+        </ProjectReference>
+    </ItemGroup>
+
+</Project>

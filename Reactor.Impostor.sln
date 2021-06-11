@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactor.Impostor", "Reactor.Impostor\Reactor.Impostor.csproj", "{1522BD93-2A54-4B2C-8137-179978CD8D98}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactor.Impostor.Example", "Reactor.Impostor.Example\Reactor.Impostor.Example.csproj", "{9CA8D857-B2B8-4A82-9622-9E87281EC6E3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1522BD93-2A54-4B2C-8137-179978CD8D98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1522BD93-2A54-4B2C-8137-179978CD8D98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1522BD93-2A54-4B2C-8137-179978CD8D98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1522BD93-2A54-4B2C-8137-179978CD8D98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CA8D857-B2B8-4A82-9622-9E87281EC6E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CA8D857-B2B8-4A82-9622-9E87281EC6E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CA8D857-B2B8-4A82-9622-9E87281EC6E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CA8D857-B2B8-4A82-9622-9E87281EC6E3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
