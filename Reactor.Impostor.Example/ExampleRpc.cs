@@ -34,7 +34,7 @@ namespace Reactor.Impostor.Example
 
         public ValueTask SendAsync(IInnerPlayerControl player, string text, IClient? targetClient = null)
         {
-            var data = _writerProvider.Get();
+            using var data = _writerProvider.Get();
             Serialize(data, text);
             return base.SendAsync(player, data, targetClient?.Id ?? null);
         }
