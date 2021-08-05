@@ -66,7 +66,7 @@ namespace Reactor.Impostor.Net
             {
                 var game = innerNetObject.Game;
 
-                var data = _writerProvider.Get();
+                using var data = _writerProvider.Get();
                 Buffer.BlockCopy(messageReader.Buffer, messageReader.Offset, data.Buffer, data.Position, messageReader.Length);
                 data.Position += messageReader.Length;
                 if (data.Position > data.Length) data.Length = data.Position;
