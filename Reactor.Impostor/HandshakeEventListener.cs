@@ -65,12 +65,20 @@ namespace Reactor.Impostor
         public void OnGamePlayerPreJoinEvent(IGamePlayerJoiningEvent e)
         {
             var client = e.Player.Client;
+            var clientInfo = client.GetReactor();
+
             var host = e.Game.Host;
+
+            if (clientInfo != null && clientInfo.Mods.Count != clientInfo.ModCount)
+            {
+                e.JoinResult = GameJoinResult.CreateCustomError("The modded handshake is corrupted");
+                return;
+            }
 
             if (host != null)
             {
                 var hostMods = host.Client.GetReactor()?.Mods;
-                var clientMods = client.GetReactor()?.Mods;
+                var clientMods = clientInfo?.Mods;
 
                 var clientMissing = hostMods != null
                     ? hostMods.Where(mod => mod.Side == PluginSide.Both && (clientMods == null || !clientMods.Contains(mod))).ToArray()
