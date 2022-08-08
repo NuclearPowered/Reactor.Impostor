@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+		<OutputType>Library</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<Description>Make sure people joining an Impostor room have compatible mods</Description>
+		<Authors>miniduikboot</Authors>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Impostor.Api" Version="1.6.0" />
+    <PackageReference Include="Impostor.Http" Version="0.1.0" />
+		<ProjectReference Include="..\Reactor.Impostor\Reactor.Impostor.csproj">
+			<Private>false</Private>
+		</ProjectReference>
+		
+		<!-- Code style libraries -->
+		<PackageReference Include="SonarAnalyzer.CSharp" Version="8.40.0.48530" PrivateAssets="all" />
+	</ItemGroup>
+</Project>
