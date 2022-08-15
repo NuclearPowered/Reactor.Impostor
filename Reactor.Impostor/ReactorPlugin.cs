@@ -6,39 +6,38 @@ using Impostor.Api.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 using Reactor.Impostor.Net;
 
-namespace Reactor.Impostor
+namespace Reactor.Impostor;
+
+[ImpostorPlugin("gg.reactor.impostor")]
+public class ReactorPlugin : PluginBase
 {
-    [ImpostorPlugin("gg.reactor.impostor")]
-    public class ReactorPlugin : PluginBase
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ICustomMessageManager<ICustomRootMessage> _customRootMessageManager;
+    private readonly ICustomMessageManager<ICustomRpc> _customRpcManager;
+
+    private MultiDisposable? _disposable;
+
+    public ReactorPlugin(IServiceProvider serviceProvider, ICustomMessageManager<ICustomRootMessage> customRootMessageManager, ICustomMessageManager<ICustomRpc> customRpcManager)
     {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly ICustomMessageManager<ICustomRootMessage> _customRootMessageManager;
-        private readonly ICustomMessageManager<ICustomRpc> _customRpcManager;
+        _serviceProvider = serviceProvider;
+        _customRootMessageManager = customRootMessageManager;
+        _customRpcManager = customRpcManager;
+    }
 
-        private MultiDisposable? _disposable;
+    public override ValueTask EnableAsync()
+    {
+        _disposable = new MultiDisposable(
+            _customRootMessageManager.Register(ActivatorUtilities.CreateInstance<Message255Reactor>(_serviceProvider)),
+            _customRpcManager.Register(ActivatorUtilities.CreateInstance<Rpc255Reactor>(_serviceProvider))
+        );
 
-        public ReactorPlugin(IServiceProvider serviceProvider, ICustomMessageManager<ICustomRootMessage> customRootMessageManager, ICustomMessageManager<ICustomRpc> customRpcManager)
-        {
-            _serviceProvider = serviceProvider;
-            _customRootMessageManager = customRootMessageManager;
-            _customRpcManager = customRpcManager;
-        }
+        return default;
+    }
 
-        public override ValueTask EnableAsync()
-        {
-            _disposable = new MultiDisposable(
-                _customRootMessageManager.Register(ActivatorUtilities.CreateInstance<Message255Reactor>(_serviceProvider)),
-                _customRpcManager.Register(ActivatorUtilities.CreateInstance<Rpc255Reactor>(_serviceProvider))
-            );
+    public override ValueTask DisableAsync()
+    {
+        _disposable?.Dispose();
 
-            return default;
-        }
-
-        public override ValueTask DisableAsync()
-        {
-            _disposable?.Dispose();
-
-            return default;
-        }
+        return default;
     }
 }

@@ -1,30 +1,29 @@
 using System.Runtime.CompilerServices;
 using Impostor.Api.Net;
 
-namespace Reactor.Impostor
+namespace Reactor.Impostor;
+
+public static class ClientInfoExtensions
 {
-    public static class ClientInfoExtensions
+    private static ConditionalWeakTable<IHazelConnection, ReactorClientInfo> Table { get; } = new ConditionalWeakTable<IHazelConnection, ReactorClientInfo>();
+
+    public static ReactorClientInfo? GetReactor(this IClient client)
     {
-        private static ConditionalWeakTable<IHazelConnection, ReactorClientInfo> Table { get; } = new ConditionalWeakTable<IHazelConnection, ReactorClientInfo>();
+        return client.Connection?.GetReactor();
+    }
 
-        public static ReactorClientInfo? GetReactor(this IClient client)
+    public static ReactorClientInfo? GetReactor(this IHazelConnection connection)
+    {
+        if (Table.TryGetValue(connection, out var clientInfo))
         {
-            return client.Connection?.GetReactor();
+            return clientInfo;
         }
 
-        public static ReactorClientInfo? GetReactor(this IHazelConnection connection)
-        {
-            if (Table.TryGetValue(connection, out var clientInfo))
-            {
-                return clientInfo;
-            }
+        return null;
+    }
 
-            return null;
-        }
-
-        internal static void SetReactor(this IHazelConnection connection, ReactorClientInfo clientInfo)
-        {
-            Table.AddOrUpdate(connection, clientInfo);
-        }
+    internal static void SetReactor(this IHazelConnection connection, ReactorClientInfo clientInfo)
+    {
+        Table.AddOrUpdate(connection, clientInfo);
     }
 }

@@ -3,34 +3,33 @@ using Impostor.Api.Events;
 using Impostor.Api.Plugins;
 using Reactor.Impostor.Rpcs;
 
-namespace Reactor.Impostor.Example
+namespace Reactor.Impostor.Example;
+
+[ImpostorPlugin("gg.reactor.impostor.example")]
+public class ExamplePlugin : PluginBase
 {
-    [ImpostorPlugin("gg.reactor.impostor.example")]
-    public class ExamplePlugin : PluginBase
+    private readonly IReactorCustomRpcManager _rpcManager;
+
+    private MultiDisposable? _disposable;
+
+    public ExamplePlugin(IReactorCustomRpcManager rpcManager)
     {
-        private readonly IReactorCustomRpcManager _rpcManager;
+        _rpcManager = rpcManager;
+    }
 
-        private MultiDisposable? _disposable;
+    public override ValueTask EnableAsync()
+    {
+        _disposable = new MultiDisposable(
+            _rpcManager.Register<ExampleRpc>()
+        );
 
-        public ExamplePlugin(IReactorCustomRpcManager rpcManager)
-        {
-            _rpcManager = rpcManager;
-        }
+        return default;
+    }
 
-        public override ValueTask EnableAsync()
-        {
-            _disposable = new MultiDisposable(
-                _rpcManager.Register<ExampleRpc>()
-            );
+    public override ValueTask DisableAsync()
+    {
+        _disposable?.Dispose();
 
-            return default;
-        }
-
-        public override ValueTask DisableAsync()
-        {
-            _disposable?.Dispose();
-
-            return default;
-        }
+        return default;
     }
 }
