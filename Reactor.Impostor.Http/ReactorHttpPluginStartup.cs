@@ -2,6 +2,7 @@ using Impostor.Api.Plugins;
 using Impostor.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Builder;
 
 namespace Reactor.Impostor.Http;
 /**
@@ -21,5 +22,11 @@ public class ReactorHttpPluginStartup : IPluginStartup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<IListingFilter, ReactorHandshakeFilter>();
+        services.AddSingleton<ClientModsHeader>();
+
+        ImpostorHttpPluginStartup.OnWebHostConfigure += (app) =>
+        {
+            app.UseMiddleware<ClientModsHeader>();
+        };
     }
 }

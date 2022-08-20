@@ -2,7 +2,6 @@ using Impostor.Api.Games;
 using Impostor.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Reactor.Networking;
 
 namespace Reactor.Impostor.Http;
 /**
@@ -26,11 +25,11 @@ public class ReactorHandshakeFilter : IListingFilter
     /// <inheritdoc/>
     public Func<IGame, bool> GetFilter(HttpContext context)
     {
-        var headers = context.Request.Headers["Client-Mods"];
+        var myClientInfo = context.Features.Get<ReactorClientInfo>();
 
-        // If no header was included, this is a vanilla game
-        if (headers.Count == 0)
+        if (myClientInfo == null)
         {
+            // If no header was included, this is a vanilla game
             return game =>
             {
                 var host = game.Host;
@@ -45,17 +44,9 @@ public class ReactorHandshakeFilter : IListingFilter
                 return reactor == null || !reactor.Mods.Any(x => x.Side == PluginSide.Both);
             };
         }
-        else if (headers.Count == 1)
+        else
         {
-            var myClientInfo = this.BuildReactorClientInfo(headers[0]);
-            if (myClientInfo == null)
-            {
-                this.logger.LogError("Couldn't parse ReactorClientHttp from string, \"{}\"", headers[0]);
-                return game => false;
-            }
-
-            context.Response.Headers.Add("Client-Mods-Processed", "yes");
-
+            // Otherwise check for modded games with compatible mods
             return game =>
             {
                 var host = game.Host;
@@ -74,50 +65,5 @@ public class ReactorHandshakeFilter : IListingFilter
                 return hostMods.Count() == myClientInfo.ModCount && hostMods.All(m => myClientInfo.Mods.Contains(m));
             };
         }
-        else
-        {
-            this.logger.LogError("Client sent over {} headers, expected 0 or 1", headers.Count);
-            return game => false;
-        }
-
-        throw new NotImplementedException();
-    }
-
-    private ReactorClientInfo? BuildReactorClientInfo(string str)
-    {
-        string[] parts = str.Split(';');
-        if (parts.Length < 2)
-        {
-            this.logger.LogError("Expected a version and a mod count");
-            return null;
-        }
-
-        if (parts[0] != "1")
-        {
-            this.logger.LogError("Expected version \"1\", got \"{}\"", parts[0]);
-            return null;
-        }
-
-        var modCount = int.Parse(parts[1]);
-        if (parts.Length - 2 != modCount)
-        {
-            this.logger.LogError("Expected \"{}\" mods, got \"{}\"", modCount, parts.Length - 2);
-            return null;
-        }
-
-        var clientInfo = new ReactorClientInfo(ReactorProtocolVersion.Initial, modCount);
-        for (uint i = 2; i < parts.Length; i++)
-        {
-            var modParts = parts[i].Split("=");
-            if (modParts.Length != 2)
-            {
-                this.logger.LogError("Expected exactly one \"=\" in \"{}\"", parts[i]);
-                return null;
-            }
-
-            clientInfo.Mods.Add(new Mod(i, modParts[0], modParts[1], PluginSide.Both));
-        }
-
-        return clientInfo;
     }
 }
