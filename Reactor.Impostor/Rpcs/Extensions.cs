@@ -1,37 +1,62 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
+using Reactor.Impostor.Net;
+using Reactor.Networking;
 
-namespace Reactor.Impostor.Rpcs
+namespace Reactor.Impostor.Rpcs;
+
+public static class Extensions
 {
-    public static class Extensions
+    internal static Mod ReadMod(this IMessageReader reader, ReactorClientInfo clientInfo)
     {
-        public static ValueTask SendReactorRpcAsync(this IInnerNetObject innerNetObject, IClient target, IReactorCustomRpc customRpc, IMessageWriter data, int? targetClientId = null)
+        var netId = reader.ReadPackedUInt32();
+        if (netId > 0)
         {
-            var clientInfo = target.GetReactor();
-            if (clientInfo == null)
-            {
-                throw new ArgumentException("Tried to send reactor rpc to vanilla client");
-            }
-
-            var targetMod = clientInfo.Mods.Single(x => x.Id == customRpc.ModId);
-
-            using var writer = innerNetObject.Game.StartRpc(innerNetObject.NetId, (RpcCalls) 255, targetClientId);
-
-            writer.WritePacked(targetMod.NetId);
-            writer.WritePacked(customRpc.Id);
-
-            writer.StartMessage(0);
-            writer.Write(data.ToByteArray(false));
-            writer.EndMessage();
-
-            writer.EndMessage();
-            writer.EndMessage();
-
-            return target.Connection!.SendAsync(writer);
+            return clientInfo.GetByNetId(netId);
         }
+
+        var id = reader.ReadString();
+        return clientInfo.GetModById(id);
+    }
+
+    internal static void Write(this IMessageWriter writer, Mod mod, ReactorClientInfo clientInfo)
+    {
+        if (mod.IsRequiredOnAllClients)
+        {
+            writer.WritePacked(clientInfo.GetNetId(mod));
+        }
+        else
+        {
+            writer.WritePacked(0);
+            writer.Write(mod.Id);
+        }
+    }
+
+    public static ValueTask SendReactorRpcAsync(this IInnerNetObject innerNetObject, IClient target, IReactorCustomRpc customRpc, IMessageWriter data, int? targetClientId = null)
+    {
+        var clientInfo = target.GetReactor();
+        if (clientInfo == null)
+        {
+            throw new ArgumentException("Tried to send reactor rpc to vanilla client");
+        }
+
+        var targetMod = clientInfo.GetModById(customRpc.ModId);
+
+        using var writer = innerNetObject.Game.StartRpc(innerNetObject.NetId, Rpc255Reactor.CallId, targetClientId);
+
+        writer.Write(targetMod, clientInfo);
+        writer.WritePacked(customRpc.Id);
+
+        writer.StartMessage(0);
+        writer.Write(data.ToByteArray(false));
+        writer.EndMessage();
+
+        writer.EndMessage();
+        writer.EndMessage();
+
+        return target.Connection!.SendAsync(writer);
     }
 }

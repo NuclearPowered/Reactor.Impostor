@@ -1,25 +1,23 @@
-using System.Diagnostics.CodeAnalysis;
 using Impostor.Api.Net.Messages;
 using Reactor.Networking;
 
-namespace Reactor.Impostor.Net
+namespace Reactor.Impostor.Net;
+
+public static class ModdedHandshakeC2S
 {
-    public static class ModdedHandshakeC2S
+    public static void Deserialize(IMessageReader reader, out Mod[] mods)
     {
-        public static bool Deserialize(IMessageReader reader, [NotNullWhen(true)] out ReactorProtocolVersion? version, [NotNullWhen(true)] out int? modCount)
+        var modCount = reader.ReadPackedInt32();
+        mods = new Mod[modCount];
+
+        for (var i = 0; i < modCount; i++)
         {
-            if (reader.Length > reader.Position)
-            {
-                version = (ReactorProtocolVersion) reader.ReadByte();
-                modCount = reader.ReadPackedInt32();
+            var id = reader.ReadString();
+            var version = reader.ReadString();
+            var flags = (ModFlags)reader.ReadUInt16();
+            var name = (flags & ModFlags.RequireOnAllClients) != 0 ? reader.ReadString() : null;
 
-                return true;
-            }
-
-            version = null;
-            modCount = null;
-
-            return false;
+            mods[i] = new Mod(id, version, flags, name);
         }
     }
 }

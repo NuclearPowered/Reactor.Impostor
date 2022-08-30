@@ -1,6 +1,4 @@
 using System;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Client;
@@ -12,102 +10,82 @@ using Microsoft.Extensions.Logging;
 using Reactor.Impostor.Net;
 using Reactor.Networking;
 
-namespace Reactor.Impostor
+namespace Reactor.Impostor;
+
+internal class HandshakeEventListener : IEventListener
 {
-    internal class HandshakeEventListener : IEventListener
+    private readonly ILogger<HandshakeEventListener> _logger;
+    private readonly IMessageWriterProvider _messageWriterProvider;
+    private readonly IServerEnvironment _serverEnvironment;
+
+    public HandshakeEventListener(ILogger<HandshakeEventListener> logger, IMessageWriterProvider messageWriterProvider, IServerEnvironment serverEnvironment)
     {
-        private readonly ILogger<HandshakeEventListener> _logger;
-        private readonly IMessageWriterProvider _messageWriterProvider;
-        private readonly IServerEnvironment _serverEnvironment;
+        _logger = logger;
+        _messageWriterProvider = messageWriterProvider;
+        _serverEnvironment = serverEnvironment;
+    }
 
-        public HandshakeEventListener(ILogger<HandshakeEventListener> logger, IMessageWriterProvider messageWriterProvider, IServerEnvironment serverEnvironment)
+    [EventListener]
+    public void OnClientConnectionEvent(IClientConnectionEvent e)
+    {
+        if (!ReactorHeader.TryDeserialize(e.HandshakeData, out var version))
         {
-            _logger = logger;
-            _messageWriterProvider = messageWriterProvider;
-            _serverEnvironment = serverEnvironment;
+            return;
         }
 
-        [EventListener]
-        public void OnClientConnectionEvent(IClientConnectionEvent e)
+        Mod[] mods;
+
+        if (version >= ReactorProtocolVersion.V3)
         {
-            if (!ModdedHandshakeC2S.Deserialize(e.HandshakeData, out var protocolVersion, out var modCount))
-            {
-                return;
-            }
-
-            e.Connection.SetReactor(new ReactorClientInfo(protocolVersion.Value, modCount.Value));
-
-            _logger.LogTrace("New modded connection (protocol version: {protocolVersion}, mods: {modCount})", protocolVersion, modCount);
+            ModdedHandshakeC2S.Deserialize(e.HandshakeData, out mods);
+        }
+        else
+        {
+            mods = Array.Empty<Mod>();
         }
 
-        [EventListener]
-        public async ValueTask OnClientConnectedEventAsync(IClientConnectedEvent e)
+        e.Connection.SetReactor(new ReactorClientInfo(version.Value, mods));
+
+        _logger.LogTrace("New modded connection (protocol version: {ProtocolVersion}, mods: {@Mods})", version.Value, mods);
+    }
+
+    [EventListener]
+    public async ValueTask OnClientConnectedEventAsync(IClientConnectedEvent e)
+    {
+        var clientInfo = e.Connection.GetReactor();
+
+        if (clientInfo == null)
         {
-            var clientInfo = e.Connection.GetReactor();
-
-            if (clientInfo == null)
-            {
-                return;
-            }
-
-            if (clientInfo.Version < ReactorProtocolVersion.Initial || clientInfo.Version > ReactorProtocolVersion.Latest)
-            {
-                await e.Client.DisconnectAsync(DisconnectReason.Custom, "Unsupported Reactor.Networking protocol version");
-                return;
-            }
-
-            using var writer = _messageWriterProvider.Get(MessageType.Reliable);
-            ModdedHandshakeS2C.Serialize(writer, "Impostor", _serverEnvironment.Version, 0);
-            await e.Connection.SendAsync(writer);
+            return;
         }
 
-        [EventListener]
-        public void OnGamePlayerPreJoinEvent(IGamePlayerJoiningEvent e)
+        if (clientInfo.Version != ReactorProtocolVersion.V3)
         {
-            var client = e.Player.Client;
-            var clientInfo = client.GetReactor();
+            await e.Client.DisconnectAsync(DisconnectReason.Custom, "Unsupported Reactor.Networking protocol version");
+            return;
+        }
 
-            var host = e.Game.Host;
+        using var writer = _messageWriterProvider.Get(MessageType.Reliable);
+        ModdedHandshakeS2C.Serialize(writer, "Impostor", _serverEnvironment.Version, 0);
+        await e.Connection.SendAsync(writer);
+    }
 
-            if (clientInfo != null && clientInfo.Mods.Count != clientInfo.ModCount)
+    [EventListener]
+    public void OnGamePlayerPreJoinEvent(IGamePlayerJoiningEvent e)
+    {
+        var client = e.Player.Client;
+        var clientInfo = client.GetReactor();
+
+        var host = e.Game.Host;
+
+        if (host != null)
+        {
+            var hostMods = host.Client.GetReactor()?.Mods ?? Array.Empty<Mod>();
+            var clientMods = clientInfo?.Mods ?? Array.Empty<Mod>();
+
+            if (!Mod.Validate(clientMods, hostMods, out var reason))
             {
-                e.JoinResult = GameJoinResult.CreateCustomError("The modded handshake is corrupted");
-                return;
-            }
-
-            if (host != null)
-            {
-                var hostMods = host.Client.GetReactor()?.Mods;
-                var clientMods = clientInfo?.Mods;
-
-                var clientMissing = hostMods != null
-                    ? hostMods.Where(mod => mod.Side == PluginSide.Both && (clientMods == null || !clientMods.Contains(mod))).ToArray()
-                    : Array.Empty<Mod>();
-
-                var hostMissing = clientMods != null
-                    ? clientMods.Where(mod => mod.Side == PluginSide.Both && (hostMods == null || !hostMods.Contains(mod))).ToArray()
-                    : Array.Empty<Mod>();
-
-                if (clientMissing.Any() || hostMissing.Any())
-                {
-                    var message = new StringBuilder();
-
-                    if (clientMissing.Any())
-                    {
-                        message.Append("You are missing: ");
-                        message.AppendJoin(", ", clientMissing.Select(x => $"{x.Id} ({x.Version})"));
-                        message.AppendLine();
-                    }
-
-                    if (hostMissing.Any())
-                    {
-                        message.Append("Host is missing: ");
-                        message.AppendJoin(", ", hostMissing.Select(x => $"{x.Id} ({x.Version})"));
-                        message.AppendLine();
-                    }
-
-                    e.JoinResult = GameJoinResult.CreateCustomError(message.ToString());
-                }
+                e.JoinResult = GameJoinResult.CreateCustomError(reason);
             }
         }
     }
