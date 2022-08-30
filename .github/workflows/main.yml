@@ -7,21 +7,34 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: 5.0.*
+          dotnet-version: 6.*
 
       - name: Run the Cake script
         uses: cake-build/cake-action@v1
         with:
           verbosity: Diagnostic
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: Reactor.Impostor.dll
-          path: Reactor.Impostor/bin/Release/netstandard2.1/Reactor.Impostor.dll
+          path: Reactor.Impostor/bin/Release/net6.0/Reactor.Impostor.dll
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Reactor.Impostor.Http.dll
+          path: Reactor.Impostor.Http/bin/Release/net6.0/Reactor.Impostor.Http.dll
+
+      - uses: softprops/action-gh-release@v1
+        if: github.ref_type == 'tag'
+        with:
+          draft: true
+          files: |
+            Reactor.Impostor/bin/Release/net6.0/Reactor.Impostor.dll
+            Reactor.Impostor.Http/bin/Release/net6.0/Reactor.Impostor.Http.dll
