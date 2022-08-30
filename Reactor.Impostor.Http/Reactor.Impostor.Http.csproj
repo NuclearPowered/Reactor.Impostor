@@ -13,6 +13,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Reactor.Impostor\Reactor.Impostor.csproj" Private="false" />
-        <PackageReference Include="Impostor.Http" Version="0.1.0" />
+        <PackageReference Include="Impostor.Http" Version="0.2.0" />
     </ItemGroup>
 </Project>
