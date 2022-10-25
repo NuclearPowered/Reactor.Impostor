@@ -12,9 +12,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Impostor.Api" Version="1.7.1" />
+        <PackageReference Include="Impostor.Api" Version="1.7.2" />
+        <PackageReference Include="Reactor.Networking.Shared" Version="2.0.0-ci.214" PrivateAssets="all" />
     </ItemGroup>
-
-    <Import Project="..\Reactor\Reactor.Shared\Reactor.Shared.projitems" Label="Shared" />
 
 </Project>
