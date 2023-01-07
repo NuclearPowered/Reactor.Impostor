@@ -1,18 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
 
+        <VersionPrefix>2.1.0</VersionPrefix>
+        <VersionSuffix>dev</VersionSuffix>
         <Description>Make sure people joining an Impostor room have compatible mods</Description>
-        <Authors>miniduikboot</Authors>
+        <Authors>NuclearPowered</Authors>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Reactor.Impostor\Reactor.Impostor.csproj" Private="false" />
-        <PackageReference Include="Impostor.Http" Version="0.2.0" />
+        <PackageReference Include="Impostor.Http" Version="0.4.0" />
     </ItemGroup>
 </Project>

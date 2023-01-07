@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
-using Impostor.Api.Net.Messages;
+using Impostor.Hazel.Abstractions;
 using Reactor.Impostor.Net;
 using Reactor.Networking;
 

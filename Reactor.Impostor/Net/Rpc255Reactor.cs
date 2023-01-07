@@ -4,7 +4,7 @@ using Impostor.Api;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
-using Impostor.Api.Net.Messages;
+using Impostor.Hazel.Abstractions;
 using Microsoft.Extensions.Logging;
 using Reactor.Impostor.Rpcs;
 

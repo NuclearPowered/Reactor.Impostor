@@ -4,7 +4,7 @@ using Impostor.Api.Events;
 using Impostor.Api.Events.Client;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
-using Impostor.Api.Net.Messages;
+using Impostor.Hazel.Abstractions;
 using Impostor.Api.Utils;
 using Microsoft.Extensions.Logging;
 using Reactor.Impostor.Net;
