@@ -2,7 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
-using Impostor.Api.Net.Messages;
+using Impostor.Hazel.Abstractions;
 
 namespace Reactor.Impostor.Rpcs;
 

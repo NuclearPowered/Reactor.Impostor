@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
-using Impostor.Api.Net.Messages;
+using Impostor.Hazel.Abstractions;
 using Microsoft.Extensions.Logging;
 using Reactor.Impostor.Rpcs;
 

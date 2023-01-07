@@ -1,4 +1,4 @@
-using Impostor.Api.Net.Messages;
+using Impostor.Hazel.Abstractions;
 using Reactor.Networking;
 
 namespace Reactor.Impostor.Net;
