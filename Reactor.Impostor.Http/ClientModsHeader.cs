@@ -47,8 +47,14 @@ public class ClientModsHeader : IMiddleware
         return null;
     }
 
-    private ReactorClientInfo? BuildReactorClientInfo(string str)
+    private ReactorClientInfo? BuildReactorClientInfo(string? str)
     {
+        if (str == null)
+        {
+            _logger.LogError("Expected a non-null value");
+            return null;
+        }
+        
         var parts = str.Split(';');
         if (parts.Length < 2)
         {
