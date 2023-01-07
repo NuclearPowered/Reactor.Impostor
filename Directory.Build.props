@@ -1,0 +1,17 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+
+        <VersionPrefix>2.1.0</VersionPrefix>
+        <VersionSuffix>dev</VersionSuffix>
+
+        <Authors>NuclearPowered</Authors>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/NuclearPowered/Reactor.Impostor</RepositoryUrl>
+        <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    </PropertyGroup>
+</Project>
