@@ -14,7 +14,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: 7.*
+          dotnet-version: 8.*
 
       - name: Run the Cake script
         uses: cake-build/cake-action@v1
@@ -24,17 +24,11 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: Reactor.Impostor.dll
-          path: Reactor.Impostor/bin/Release/net7.0/Reactor.Impostor.dll
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: Reactor.Impostor.Http.dll
-          path: Reactor.Impostor.Http/bin/Release/net7.0/Reactor.Impostor.Http.dll
+          path: Reactor.Impostor/bin/Release/net8.0/Reactor.Impostor.dll
 
       - uses: softprops/action-gh-release@v1
         if: github.ref_type == 'tag'
         with:
           draft: true
           files: |
-            Reactor.Impostor/bin/Release/net7.0/Reactor.Impostor.dll
-            Reactor.Impostor.Http/bin/Release/net7.0/Reactor.Impostor.Http.dll
+            Reactor.Impostor/bin/Release/net8.0/Reactor.Impostor.dll
