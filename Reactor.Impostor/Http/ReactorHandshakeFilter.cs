@@ -1,5 +1,5 @@
 using Impostor.Api.Games;
-using Impostor.Http;
+using Impostor.Api.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
