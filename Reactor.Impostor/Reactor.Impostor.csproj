@@ -2,6 +2,9 @@
 
     <PropertyGroup>
         <AssemblyTitle>Reactor</AssemblyTitle>
+        <Description>Reactor companion plugin for Impostor</Description>
+
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
