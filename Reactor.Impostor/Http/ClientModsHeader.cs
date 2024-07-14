@@ -41,7 +41,7 @@ public class ClientModsHeader : IMiddleware
 
         if (headers.Count > 1)
         {
-            _logger.LogError("Client sent over {} headers, expected 0 or 1", headers.Count);
+            _logger.LogError("Client sent over {Count} headers, expected 0 or 1", headers.Count);
         }
 
         return null;
@@ -64,14 +64,14 @@ public class ClientModsHeader : IMiddleware
 
         if (parts[0] != "1")
         {
-            _logger.LogError("Expected version \"1\", got \"{}\"", parts[0]);
+            _logger.LogError("Expected version \"1\", got \"{ActualVersion}\"", parts[0]);
             return null;
         }
 
         var modCount = int.Parse(parts[1]);
         if (parts.Length - 2 != modCount)
         {
-            _logger.LogError("Expected \"{}\" mods, got \"{}\"", modCount, parts.Length - 2);
+            _logger.LogError("Expected \"{ExpectedCount}\" mods, got \"{ActualCount}\"", modCount, parts.Length - 2);
             return null;
         }
 
@@ -81,7 +81,7 @@ public class ClientModsHeader : IMiddleware
             var modParts = parts[i].Split("=");
             if (modParts.Length != 2)
             {
-                _logger.LogError("Expected exactly one \"=\" in \"{}\"", parts[i]);
+                _logger.LogError("Expected exactly one \"=\" in \"{ModPart}\"", parts[i]);
                 return null;
             }
 
